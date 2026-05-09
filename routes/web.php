@@ -1,11 +1,12 @@
 <?php
 
-use App\Http\Controllers\TestController;
+use App\Http\Controllers\PublicController;
+
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// ============================================================
+// HALAMAN PUBLIK UTAMA
+// ============================================================
+Route::get('/', [PublicController::class, 'index'])->name('home');
 
-Route::get('/test-engine', [TestController::class, 'index'])->name('test-engine.index');
-Route::post('/test-engine/fetch', [TestController::class, 'fetch'])->name('test-engine.fetch');
+// (End of routes)

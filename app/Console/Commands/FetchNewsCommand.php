@@ -30,7 +30,9 @@ class FetchNewsCommand extends Command
     public function handle(): int
     {
         // =====================================================
-        // LANGKAH 1: Tarik semua sumber yang aktif
+        // LANGKAH 1: Tarik semua sumber yang aktif (Normal Hierarchy)
+        // Mengeksekusi sesuai urutan di database (Opsi C).
+        // Sumber pertama akan menyedot semua berita global Harian Jogja.
         // =====================================================
         $sources = Source::where('is_active', true)->get();
 
@@ -50,9 +52,10 @@ class FetchNewsCommand extends Command
                 // =====================================================
                 // LANGKAH 2: Eksekusi HTTP — Unduh dokumen XML
                 // =====================================================
-                $response = Http::timeout(30)
+                $response = Http::withOptions(['verify' => false])
+                    ->timeout(30)
                     ->withHeaders([
-                        'User-Agent' => 'AgregatorBerita/1.0 (RSS Reader)',
+                        'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
                     ])
                     ->get($source->rss_url);
 
@@ -234,18 +237,32 @@ class FetchNewsCommand extends Command
             $mediaContent = $item->children($ns, true);
 
             if (isset($mediaContent->content)) {
-                $mediaUrl = (string) $mediaContent->content['url'];
+                // Cek attributes() terlebih dahulu (PHP 8 SimpleXML behavior)
+                $mediaUrl = (string) $mediaContent->content->attributes()->url;
+                if (empty($mediaUrl)) {
+                    $mediaUrl = (string) $mediaContent->content['url'];
+                }
+                
                 if (!empty($mediaUrl)) {
                     $imageUrls[] = $mediaUrl;
                 }
             }
 
             if (isset($mediaContent->thumbnail)) {
-                $thumbUrl = (string) $mediaContent->thumbnail['url'];
+                $thumbUrl = (string) $mediaContent->thumbnail->attributes()->url;
+                if (empty($thumbUrl)) {
+                    $thumbUrl = (string) $mediaContent->thumbnail['url'];
+                }
                 if (!empty($thumbUrl)) {
                     $imageUrls[] = $thumbUrl;
                 }
             }
+        }
+        
+        // 3. Cek tag imglink (Sering digunakan oleh portal lokal seperti iNews)
+        $imglink = (string) ($item->imglink ?? '');
+        if (!empty($imglink)) {
+            $imageUrls[] = $imglink;
         }
 
         // 3. Fallback: Cari tag <img> di dalam description

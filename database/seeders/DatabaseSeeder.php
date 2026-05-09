@@ -71,31 +71,31 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'category_id'     => $catUtamaId,
-                'name'            => 'Jogjapolitan (Pemerintahan)',
-                'rss_url'         => 'https://jogjapolitan.harianjogja.com/rss',
+                'name'            => 'Detik Jogja (Regional)',
+                'rss_url'         => 'https://www.detik.com/jogja/rss',
                 'is_active'       => true,
                 'last_fetched_at' => null,
                 'created_at'      => now(),
                 'updated_at'      => now(),
             ],
             
-            // --- Kategori Kuliner, Wisata, Hiburan (Gaya Hidup Lokal) ---
+            // --- Kategori Kabar Pemerintahan ---
             [
-                'category_id'     => $catKulinerId,
-                'name'            => 'Harian Jogja Leisure (Gaya Hidup)',
-                'rss_url'         => 'https://leisure.harianjogja.com/rss',
+                'category_id'     => $catWisataId,
+                'name'            => 'JPNN Jogja',
+                'rss_url'         => 'https://jogja.jpnn.com/feed/rss',
                 'is_active'       => true,
                 'last_fetched_at' => null,
                 'created_at'      => now(),
                 'updated_at'      => now(),
             ],
 
-            // --- Simulasi Sumber Error (403 Forbidden) ---
+            // --- Kategori Kuliner, Wisata, Hiburan ---
             [
-                'category_id'     => $catUtamaId,
-                'name'            => 'Tribun Jogja (Simulasi WAF)',
-                'rss_url'         => 'https://jogja.tribunnews.com/rss',
-                'is_active'       => true, // Dibiarkan aktif agar terekam di logs_failed
+                'category_id'     => $catKulinerId,
+                'name'            => 'iNews Yogya',
+                'rss_url'         => 'https://yogya.inews.id/feed',
+                'is_active'       => true,
                 'last_fetched_at' => null,
                 'created_at'      => now(),
                 'updated_at'      => now(),
