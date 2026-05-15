@@ -201,7 +201,7 @@
                         Berita Terbaru
                     @endif
                 </h2>
-                <p class="text-sm text-gray-500 mt-1">{{ $articles->count() }} artikel ditemukan</p>
+                <p class="text-sm text-gray-500 mt-1">Menampilkan {{ $articles->count() }} artikel</p>
             </div>
         </div>
 
@@ -320,6 +320,41 @@
                         </div>
                     </article>
                 @endforeach
+            </div>
+        @endif
+
+
+        {{-- ── Cursor Pagination Navigation ─────────────────────────────── --}}
+        @if($articles->hasPages())
+            <div class="flex items-center justify-between mt-12 pt-8 border-t border-gray-200">
+                {{-- Tombol Sebelumnya --}}
+                <div>
+                    @if($articles->previousPageUrl())
+                        <a href="{{ $articles->previousPageUrl() }}"
+                           class="inline-flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-200 rounded-xl text-sm font-semibold text-gray-700 hover:bg-gray-50 hover:border-gray-300 shadow-sm transition-all">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                            </svg>
+                            Berita Lebih Baru
+                        </a>
+                    @endif
+                </div>
+
+                {{-- Indicator --}}
+                <p class="text-xs text-gray-400 hidden sm:block">Halaman ini memuat 15 artikel</p>
+
+                {{-- Tombol Berikutnya --}}
+                <div>
+                    @if($articles->nextPageUrl())
+                        <a href="{{ $articles->nextPageUrl() }}"
+                           class="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 border border-blue-600 rounded-xl text-sm font-semibold text-white hover:bg-blue-700 shadow-sm transition-all">
+                            Berita Lebih Lama
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </a>
+                    @endif
+                </div>
             </div>
         @endif
 
