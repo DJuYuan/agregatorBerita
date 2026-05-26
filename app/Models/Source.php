@@ -3,11 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Source extends Model
 {
+    use SoftDeletes;
     protected $fillable = [
         'category_id',
         'name',
@@ -42,5 +44,10 @@ class Source extends Model
     public function logsFailed(): HasMany
     {
         return $this->hasMany(LogFailed::class);
+    }
+
+    public function dailyStats(): HasMany
+    {
+        return $this->hasMany(SourceDailyStat::class);
     }
 }

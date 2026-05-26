@@ -40,6 +40,11 @@ class Article extends Model
         return $this->hasMany(Image::class);
     }
 
+    public function tags(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(Tag::class);
+    }
+
     // ── Prunable — Retensi Otomatis (>30 Hari) ───────────────────────────
     // Menggunakan MassPrunable agar lebih efisien: tidak memuat model satu-per-satu
     // ke memory. Satu DELETE query dengan subquery, cukup untuk skala besar.

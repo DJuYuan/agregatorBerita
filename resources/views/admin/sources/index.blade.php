@@ -10,6 +10,24 @@
         </a>
     </div>
 
+    {{-- Tabs Filter Status --}}
+    <div class="mb-6 border-b border-gray-200">
+        <nav class="-mb-px flex space-x-8">
+            <a href="{{ route('admin.sources.index', ['filter' => 'semua']) }}" class="whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm {{ $filter === 'semua' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }}">
+                Semua Sumber
+            </a>
+            <a href="{{ route('admin.sources.index', ['filter' => 'aktif']) }}" class="whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm {{ $filter === 'aktif' ? 'border-green-500 text-green-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }}">
+                Sedang Aktif
+            </a>
+            <a href="{{ route('admin.sources.index', ['filter' => 'mati']) }}" class="whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm {{ $filter === 'mati' ? 'border-gray-500 text-gray-800' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }}">
+                Nonaktif
+            </a>
+            <a href="{{ route('admin.sources.index', ['filter' => 'terhapus']) }}" class="whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm {{ $filter === 'terhapus' ? 'border-red-500 text-red-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }}">
+                Kotak Sampah (Soft Delete)
+            </a>
+        </nav>
+    </div>
+
     <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
             <h2 class="text-base font-bold text-gray-900">Daftar Sumber RSS</h2>
@@ -29,9 +47,12 @@
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-100">
                     @forelse($sources as $source)
-                        <tr class="hover:bg-gray-50 transition-colors">
+                        <tr class="hover:bg-gray-50 transition-colors {{ $source->trashed() ? 'opacity-60' : '' }}">
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <span class="text-sm font-semibold text-gray-900">{{ $source->name }}</span>
+                                @if($source->trashed())
+                                    <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">Dihapus</span>
+                                @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
@@ -44,14 +65,21 @@
                                 </a>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-center">
-                                <form method="POST" action="{{ route('admin.sources.toggle', $source) }}">
-                                    @csrf
-                                    @method('PATCH')
-                                    <button type="submit" class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-full transition-colors {{ $source->is_active ? 'bg-green-100 text-green-700 hover:bg-green-200' : 'bg-gray-100 text-gray-500 hover:bg-gray-200' }}">
-                                        <span class="w-1.5 h-1.5 rounded-full {{ $source->is_active ? 'bg-green-500' : 'bg-gray-400' }}"></span>
-                                        {{ $source->is_active ? 'Aktif' : 'Nonaktif' }}
-                                    </button>
-                                </form>
+                                @if(!$source->trashed())
+                                    <form method="POST" action="{{ route('admin.sources.toggle', $source) }}">
+                                        @csrf
+                                        @method('PATCH')
+                                        <button type="submit" class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-full transition-colors {{ $source->is_active ? 'bg-green-100 text-green-700 hover:bg-green-200' : 'bg-gray-100 text-gray-500 hover:bg-gray-200' }}">
+                                            <span class="w-1.5 h-1.5 rounded-full {{ $source->is_active ? 'bg-green-500' : 'bg-gray-400' }}"></span>
+                                            {{ $source->is_active ? 'Aktif' : 'Nonaktif' }}
+                                        </button>
+                                    </form>
+                                @else
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-500">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-gray-400"></span>
+                                        Mati
+                                    </span>
+                                @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-center">
                                 <span class="text-xs text-gray-500">
@@ -59,17 +87,40 @@
                                 </span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right">
-                                <button
-                                    x-data
-                                    @click="$dispatch('open-confirm-modal', {
-                                        url: '{{ route('admin.sources.destroy', $source) }}',
-                                        method: 'DELETE'
-                                    })"
-                                    class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100 hover:text-red-700 focus:outline-none transition-colors"
-                                >
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                    Hapus
-                                </button>
+                                <div class="flex items-center justify-end gap-2">
+                                    @if($source->trashed())
+                                        {{-- Tombol Restore --}}
+                                        <form method="POST" action="{{ route('admin.sources.restore', $source->id) }}">
+                                            @csrf
+                                            <button type="submit" class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-green-700 bg-green-50 rounded-lg hover:bg-green-100 focus:outline-none transition-colors">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg>
+                                                Kembalikan
+                                            </button>
+                                        </form>
+                                    @else
+                                        {{-- Tombol Test Fetch --}}
+                                        <form method="POST" action="{{ route('admin.sources.test', $source) }}" onsubmit="return confirm('Uji tarik data akan dijalankan secara real-time. Lanjutkan?');">
+                                            @csrf
+                                            <button type="submit" class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-purple-700 bg-purple-50 rounded-lg hover:bg-purple-100 focus:outline-none transition-colors">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                                                Uji Tarik
+                                            </button>
+                                        </form>
+
+                                        {{-- Tombol Hapus (Soft Delete) --}}
+                                        <button
+                                            x-data
+                                            @click="$dispatch('open-confirm-modal', {
+                                                url: '{{ route('admin.sources.destroy', $source) }}',
+                                                method: 'DELETE'
+                                            })"
+                                            class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100 hover:text-red-700 focus:outline-none transition-colors"
+                                        >
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                            Hapus
+                                        </button>
+                                    @endif
+                                </div>
                             </td>
                         </tr>
                     @empty
@@ -86,7 +137,7 @@
     </div>
 
     <x-confirm-modal
-        title="Hapus Sumber RSS?"
-        body="Apakah Anda yakin? Semua berita yang terhubung dengan sumber RSS ini akan ikut terhapus secara permanen dan tidak dapat dikembalikan!"
+        title="Pindahkan ke Kotak Sampah?"
+        body="Apakah Anda yakin? Sumber RSS ini akan dihentikan dan disembunyikan. Namun, berita yang telah ditarik tidak akan hilang."
     />
 </x-admin-layout>

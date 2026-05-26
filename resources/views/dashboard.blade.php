@@ -6,7 +6,7 @@
             <h1 class="text-2xl font-bold text-gray-900">Dasbor Pemantauan</h1>
             <p class="mt-1 text-sm text-gray-500">
                 Selamat datang kembali, <span class="font-semibold text-gray-700">{{ Auth::user()->name }}</span>.
-                Berikut ringkasan kondisi sistem agregasi berita saat ini.
+                Berikut ringkasan analitik dan kondisi sistem agregasi berita saat ini.
             </p>
         </div>
         <span class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 text-xs font-medium bg-green-100 text-green-700 rounded-full border border-green-200">
@@ -29,6 +29,17 @@
             </div>
         </div>
 
+        {{-- Total Klik / Views --}}
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 flex items-center gap-4 hover:shadow-md transition-shadow">
+            <div class="flex-shrink-0 w-12 h-12 flex items-center justify-center rounded-xl bg-purple-50 text-purple-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+            </div>
+            <div>
+                <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">Total Kunjungan</p>
+                <p class="text-2xl font-bold text-gray-900 mt-0.5">{{ number_format($stats['total_clicks']) }}</p>
+            </div>
+        </div>
+
         {{-- Sumber Aktif --}}
         <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 flex items-center gap-4 hover:shadow-md transition-shadow">
             <div class="flex-shrink-0 w-12 h-12 flex items-center justify-center rounded-xl bg-green-50 text-green-600">
@@ -45,7 +56,7 @@
 
         {{-- Total Kategori --}}
         <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 flex items-center gap-4 hover:shadow-md transition-shadow">
-            <div class="flex-shrink-0 w-12 h-12 flex items-center justify-center rounded-xl bg-purple-50 text-purple-600">
+            <div class="flex-shrink-0 w-12 h-12 flex items-center justify-center rounded-xl bg-orange-50 text-orange-600">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
             </div>
             <div>
@@ -54,16 +65,66 @@
             </div>
         </div>
 
-        {{-- Shortcut Tambah Sumber --}}
-        <a href="{{ route('admin.sources.create') }}" class="group bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl shadow-sm border border-blue-500 p-5 flex items-center gap-4 hover:shadow-md hover:from-blue-700 hover:to-blue-800 transition-all">
-            <div class="flex-shrink-0 w-12 h-12 flex items-center justify-center rounded-xl bg-white/20 text-white">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+    </div>
+
+    {{-- ── Middle Section: Metric Report Grid ────────────────────────── --}}
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+
+        {{-- Papan Peringkat Portal Kontributor (Leaderboard) --}}
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-100">
+                <h2 class="text-base font-bold text-gray-900">Kontributor Portal Teratas</h2>
+                <p class="text-xs text-gray-400 mt-0.5">Daftar portal berita yang paling aktif menyuplai artikel berita</p>
             </div>
-            <div>
-                <p class="text-xs font-medium text-blue-200 uppercase tracking-wider">Aksi Cepat</p>
-                <p class="text-sm font-bold text-white mt-0.5 group-hover:underline">Tambah Sumber RSS</p>
+            <div class="p-6">
+                <div class="space-y-4">
+                    @forelse($sourceLeaderboard as $source)
+                        <div>
+                            <div class="flex justify-between items-center text-sm mb-1.5">
+                                <span class="font-semibold text-gray-800">{{ $source['name'] }}</span>
+                                <span class="text-xs text-gray-500 font-mono">{{ number_format($source['count']) }} berita ({{ $source['percentage'] }}%)</span>
+                            </div>
+                            <div class="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
+                                <div class="bg-blue-600 h-full rounded-full transition-all duration-500" style="width: {{ $source['percentage'] }}%"></div>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="text-center py-8 text-sm text-gray-400">Belum ada data kontributor.</div>
+                    @endforelse
+                </div>
             </div>
-        </a>
+        </div>
+
+        {{-- 5 Berita Terpopuler (Top 5 Clicks) --}}
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                <div>
+                    <h2 class="text-base font-bold text-gray-900">Artikel Terpopuler</h2>
+                    <p class="text-xs text-gray-400 mt-0.5">Artikel dengan minat baca (views) tertinggi</p>
+                </div>
+                <span class="text-[10px] uppercase font-semibold text-purple-700 bg-purple-50 px-2 py-0.5 rounded">Populer</span>
+            </div>
+            <div class="divide-y divide-gray-100">
+                @forelse($trendingArticles as $article)
+                    <div class="p-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
+                        <div class="max-w-[75%]">
+                            <a href="{{ $article->link }}" target="_blank" class="text-sm font-bold text-gray-800 hover:text-blue-600 line-clamp-1">
+                                {{ $article->title }}
+                            </a>
+                            <p class="text-xs text-gray-400 mt-0.5">{{ $article->source->name ?? 'Portal Sumber' }}</p>
+                        </div>
+                        <div class="text-right">
+                            <span class="inline-flex items-center gap-1 text-xs font-semibold text-purple-700 bg-purple-50 px-2.5 py-1 rounded-lg">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                {{ number_format($article->clicks) }}
+                            </span>
+                        </div>
+                    </div>
+                @empty
+                    <div class="text-center py-16 text-sm text-gray-400">Belum ada kunjungan pada artikel.</div>
+                @endforelse
+            </div>
+        </div>
 
     </div>
 
@@ -160,4 +221,3 @@
     <x-confirm-modal title="Konfirmasi Aksi" body="Apakah Anda yakin ingin melanjutkan aksi ini?" />
 
 </x-admin-layout>
-

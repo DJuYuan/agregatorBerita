@@ -11,8 +11,19 @@ export default {
 
     theme: {
         extend: {
+            // ── Wired Editorial Design System ─────────────────────────────
             fontFamily: {
-                sans: ['Figtree', ...defaultTheme.fontFamily.sans],
+                // Font naratif — digunakan pada judul artikel & headline besar
+                serif: ['Playfair Display', ...defaultTheme.fontFamily.serif],
+                // Font fungsional — digunakan pada navigasi, label, tombol, metadata
+                sans: ['Inter', ...defaultTheme.fontFamily.sans],
+            },
+            colors: {
+                // Palet Monokrom Mutlak
+                primary:  '#000000',  // Teks utama & tombol utama
+                canvas:   '#ffffff',  // Latar belakang (putih kertas)
+                hairline: '#e0e0e0',  // Garis pemisah 1px
+                muted:    '#6b6b6b',  // Teks metadata / keterangan
             },
         },
     },

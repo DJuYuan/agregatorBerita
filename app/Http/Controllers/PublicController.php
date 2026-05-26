@@ -47,4 +47,18 @@ class PublicController extends Controller
 
         return view('welcome', compact('articles', 'categories'));
     }
+
+    /**
+     * Rute perantara untuk melacak klik artikel sebelum melempar ke situs asli.
+     */
+    public function go($slug)
+    {
+        $article = Article::where('slug', $slug)->firstOrFail();
+        
+        // Catat klik
+        $article->increment('clicks');
+
+        // Arahkan ke URL asli di tab baru (ditangani oleh atribut target="_blank" di view)
+        return redirect()->away($article->link);
+    }
 }
