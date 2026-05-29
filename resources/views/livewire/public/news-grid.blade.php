@@ -3,27 +3,21 @@
     {{-- HEADER: Search Bar & Title                                   --}}
     {{-- ============================================================ --}}
     <header class="bg-canvas border-b border-hairline relative">
-        {{-- SKELETON LOADING OVERLAY --}}
-        <div wire:loading class="absolute inset-0 z-10 bg-canvas/50 backdrop-blur-sm flex items-center justify-center">
-            <div class="flex items-center gap-2 px-4 py-2 bg-primary text-canvas font-sans font-bold text-xs tracking-widest uppercase">
-                <svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                Memproses...
-            </div>
-        </div>
+        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 {{ empty($search) ? 'py-14 sm:py-20' : 'py-6' }} text-center">
+            @if(empty($search))
+                <p class="font-sans font-bold text-xs tracking-widest uppercase text-muted mb-6">
+                    ● SEPUTAR DAERAH ISTIMEWA YOGYAKARTA
+                </p>
 
-        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-20 text-center">
-            <p class="font-sans font-bold text-xs tracking-widest uppercase text-muted mb-6">
-                ● SEPUTAR DAERAH ISTIMEWA YOGYAKARTA
-            </p>
+                <h1 class="font-serif text-4xl sm:text-6xl font-bold text-primary leading-tight mb-4">
+                    Semua Kabar Jogja,<br>
+                    <em class="font-serif font-normal not-italic">Satu Layar.</em>
+                </h1>
 
-            <h1 class="font-serif text-4xl sm:text-6xl font-bold text-primary leading-tight mb-4">
-                Semua Kabar Jogja,<br>
-                <em class="font-serif font-normal not-italic">Satu Layar.</em>
-            </h1>
-
-            <p class="font-sans text-sm text-muted leading-relaxed mb-10 max-w-xl mx-auto">
-                Akses cepat untuk semua berita, peristiwa, dan pengumuman terbaru dari berbagai sumber terpercaya.
-            </p>
+                <p class="font-sans text-sm text-muted leading-relaxed mb-10 max-w-xl mx-auto">
+                    Akses cepat untuk semua berita, peristiwa, dan pengumuman terbaru dari berbagai sumber terpercaya.
+                </p>
+            @endif
 
             {{-- LIVE SEARCH BAR (DEBOUNCE 500ms) --}}
             <div class="relative max-w-2xl mx-auto">
@@ -37,9 +31,6 @@
                         placeholder="Cari rekayasa lalu lintas, cuaca ekstrem, acara lokal..."
                         class="flex-1 px-4 py-3.5 font-sans text-sm text-primary bg-transparent border-none outline-none placeholder-muted"
                     >
-                    <button class="flex-shrink-0 px-6 py-3.5 bg-primary text-canvas font-sans font-bold text-xs tracking-widest uppercase transition-opacity hover:opacity-80">
-                        Cari
-                    </button>
                 </div>
             </div>
 
@@ -170,9 +161,11 @@
                 <div class="mt-12 text-center">
                     <button wire:click="loadMore" class="inline-flex items-center justify-center px-8 py-4 bg-primary text-canvas font-sans font-bold text-xs tracking-widest uppercase hover:opacity-80 transition-opacity group">
                         <span wire:loading.remove wire:target="loadMore">Muat Lebih Banyak Berita</span>
-                        <span wire:loading wire:target="loadMore" class="flex items-center gap-2">
-                            <svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                            Sedang Memuat...
+                        <span wire:loading wire:target="loadMore" class="inline-block">
+                            <span class="flex items-center justify-center gap-2">
+                                <svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                Sedang Memuat...
+                            </span>
                         </span>
                     </button>
                 </div>

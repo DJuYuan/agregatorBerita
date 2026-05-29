@@ -35,6 +35,24 @@
                         @enderror
                         <p class="mt-1.5 text-xs text-gray-400">Slug akan dibuat otomatis dari nama.</p>
                     </div>
+
+                    <div class="mb-4">
+                        <label for="keywords" class="block text-sm font-medium text-gray-700 mb-1">Kata Kunci Penapisan (Opsional)</label>
+                        <textarea
+                            id="keywords"
+                            name="keywords"
+                            rows="3"
+                            placeholder="Contoh: wisata, destinasi, liburan, pantai (pisahkan dengan koma)"
+                            class="block w-full px-3 py-2 border {{ $errors->has('keywords') ? 'border-red-500 bg-red-50' : 'border-gray-300' }} rounded-lg text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                        >{{ old('keywords') }}</textarea>
+                        @error('keywords')
+                            <p class="mt-1.5 text-xs text-red-600 flex items-center gap-1">
+                                <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
+                                {{ $message }}
+                            </p>
+                        @enderror
+                        <p class="mt-1.5 text-xs text-gray-400">Kosongkan untuk meloloskan semua artikel tanpa filter kata kunci.</p>
+                    </div>
                     <button type="submit" class="w-full inline-flex justify-center items-center gap-2 px-4 py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition shadow-sm">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                         Simpan Kategori
@@ -56,6 +74,7 @@
                             <tr>
                                 <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Nama</th>
                                 <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Slug</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Kata Kunci</th>
                                 <th class="px-6 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">Sumber</th>
                                 <th class="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Aksi</th>
                             </tr>
@@ -68,6 +87,13 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <code class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">{{ $category->slug }}</code>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        @if($category->keywords)
+                                            <span class="text-xs text-gray-600 line-clamp-2" title="{{ $category->keywords }}">{{ $category->keywords }}</span>
+                                        @else
+                                            <span class="text-xs text-gray-400 italic">Tanpa Filter</span>
+                                        @endif
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-center">
                                         <span class="text-sm text-gray-600 font-semibold">{{ $category->sources_count }}</span>

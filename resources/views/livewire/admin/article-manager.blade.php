@@ -7,8 +7,19 @@
     </div>
 
     @if (session()->has('success'))
-        <div class="p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50" role="alert">
-            {{ session('success') }}
+        <div class="fixed top-20 right-6 z-50 w-full max-w-sm max-h-80 overflow-y-auto bg-white rounded-xl shadow-2xl ring-1 ring-gray-200 p-4 transition-all" role="alert">
+            <div class="flex items-start gap-4">
+                <div class="flex-shrink-0">
+                    <svg class="w-6 h-6 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                </div>
+                <div class="flex-1">
+                    <p class="text-sm font-bold text-gray-900">Berhasil</p>
+                    <p class="mt-1 text-sm text-gray-600">{{ session('success') }}</p>
+                </div>
+                <button onclick="this.parentElement.parentElement.style.display='none'" class="text-gray-400 hover:text-gray-500">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+            </div>
         </div>
     @endif
 
@@ -87,7 +98,7 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right">
                                 <div class="flex justify-end gap-2">
-                                    <a href="{{ $article->link }}" target="_blank" class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 focus:outline-none transition-colors">
+                                    <a href="{{ $article->link }}" target="_blank" class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-blue-500 transition-colors shadow-sm">
                                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
                                         Buka
                                     </a>

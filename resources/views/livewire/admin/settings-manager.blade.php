@@ -42,14 +42,14 @@
                                 </div>
                                 <div class="md:col-span-2">
                                     @if($item['type'] === 'number')
-                                        <input wire:model="settings.{{ $originalIndex }}.value" type="number" class="w-full max-w-md rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+                                        <input wire:model="settings.{{ $originalIndex }}.value" type="number" placeholder="Contoh: 10" class="w-full max-w-md rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
                                     @elseif($item['type'] === 'boolean')
                                         <select wire:model="settings.{{ $originalIndex }}.value" class="w-full max-w-md rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
                                             <option value="true">Aktif</option>
                                             <option value="false">Nonaktif</option>
                                         </select>
                                     @else
-                                        <input wire:model="settings.{{ $originalIndex }}.value" type="text" class="w-full max-w-md rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+                                        <input wire:model="settings.{{ $originalIndex }}.value" type="text" placeholder="Masukkan {{ strtolower($item['label']) }}..." class="w-full max-w-md rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
                                     @endif
                                 </div>
                             </div>

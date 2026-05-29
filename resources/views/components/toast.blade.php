@@ -8,7 +8,7 @@
          x-transition:leave="transition ease-in duration-100" 
          x-transition:leave-start="opacity-100" 
          x-transition:leave-end="opacity-0" 
-         class="fixed bottom-0 right-0 z-50 flex items-end justify-center px-4 py-6 pointer-events-none sm:p-6 sm:items-start sm:justify-end">
+         class="fixed inset-0 z-50 flex items-end justify-center px-4 py-6 pointer-events-none sm:p-6 sm:items-start sm:justify-end">
         
         <div class="max-w-sm w-full {{ session('success') ? 'bg-green-50' : 'bg-red-50' }} shadow-lg rounded-lg pointer-events-auto ring-1 {{ session('success') ? 'ring-green-500' : 'ring-red-500' }} ring-opacity-20 overflow-hidden">
             <div class="p-4">
@@ -24,7 +24,7 @@
                             </svg>
                         @endif
                     </div>
-                    <div class="ml-3 w-0 flex-1 pt-0.5">
+                    <div class="ml-3 flex-1 pt-0.5">
                         <p class="text-sm font-medium {{ session('success') ? 'text-green-800' : 'text-red-800' }}">
                             {{ session('success') ? 'Berhasil!' : 'Terjadi Kesalahan!' }}
                         </p>

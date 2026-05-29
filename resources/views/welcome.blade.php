@@ -81,12 +81,12 @@
     {{-- ============================================================ --}}
     {{-- 1. TOP NAVBAR                                                 --}}
     {{-- ============================================================ --}}
-    <nav id="navbar" class="sticky top-0 z-50 bg-canvas border-b border-hairline">
+    <nav id="navbar" class="group sticky top-0 z-50 bg-canvas border-b border-hairline transition-all duration-300">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-14">
+            <div class="flex items-start justify-between">
 
                 {{-- Wordmark --}}
-                <a href="{{ route('home') }}" class="flex items-center gap-3 flex-shrink-0">
+                <a href="{{ route('home') }}" class="flex items-center gap-3 flex-shrink-0 h-14">
                     {{-- Kotak hitam tajam sebagai penanda merek --}}
                     <div class="w-7 h-7 bg-primary flex items-center justify-center flex-shrink-0">
                         <span class="text-canvas font-sans font-bold text-xs tracking-widest">M</span>
@@ -97,9 +97,9 @@
                 </a>
 
                 {{-- Navigation Links (Desktop) --}}
-                <div class="hidden md:flex items-center gap-0">
+                <div class="hidden md:flex flex-wrap justify-end flex-1 ml-8 max-h-14 overflow-hidden group-hover:max-h-96 transition-all duration-500 ease-in-out">
                     <a href="{{ route('home') }}"
-                       class="px-4 py-5 font-sans font-bold text-xs tracking-widest uppercase border-b-2 transition-colors duration-150
+                       class="px-4 h-14 flex items-center font-sans font-bold text-xs tracking-widest uppercase border-b-2 transition-colors duration-150
                               {{ !request()->filled('category') && !request()->filled('search')
                                  ? 'border-primary text-primary'
                                  : 'border-transparent text-muted hover:text-primary' }}">
@@ -108,7 +108,7 @@
 
                     @foreach ($categories as $category)
                         <a href="{{ route('home', ['category' => $category->slug]) }}"
-                           class="px-4 py-5 font-sans font-bold text-xs tracking-widest uppercase border-b-2 transition-colors duration-150
+                           class="px-4 h-14 flex items-center font-sans font-bold text-xs tracking-widest uppercase border-b-2 transition-colors duration-150
                                   {{ request('category') === $category->slug
                                      ? 'border-primary text-primary'
                                      : 'border-transparent text-muted hover:text-primary' }}">
@@ -118,7 +118,7 @@
                 </div>
 
                 {{-- Mobile Toggle --}}
-                <button id="mobile-menu-btn" class="md:hidden p-2 text-primary">
+                <button id="mobile-menu-btn" class="md:hidden p-2 text-primary h-14 flex items-center">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
                     </svg>

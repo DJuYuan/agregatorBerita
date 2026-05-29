@@ -17,11 +17,14 @@ class CategoryController extends Controller
 
     public function store(StoreCategoryRequest $request)
     {
-        $name = $request->validated()['name'];
+        $validated = $request->validated();
+        $name = $validated['name'];
+        $keywords = $validated['keywords'] ?? null;
 
         Category::create([
-            'name' => $name,
-            'slug' => Str::slug($name),
+            'name'     => $name,
+            'slug'     => Str::slug($name),
+            'keywords' => $keywords,
         ]);
 
         return redirect()->route('admin.categories.index')

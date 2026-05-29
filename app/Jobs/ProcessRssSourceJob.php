@@ -83,6 +83,13 @@ class ProcessRssSourceJob implements ShouldQueue
                 return;
             }
 
+            $category = $this->source->category;
+            $keywordsStr = $category ? $category->keywords : null;
+            $keywords = [];
+            if (!empty($keywordsStr)) {
+                $keywords = array_filter(array_map('trim', explode(',', $keywordsStr)));
+            }
+
             $fetchedCount = 0;
 
             foreach ($items as $item) {
@@ -99,6 +106,33 @@ class ProcessRssSourceJob implements ShouldQueue
                 $pubDate     = (string) ($item->pubDate ?? '');
 
                 if (empty($title) || empty($link)) continue;
+
+                // Ekstrak tag dari RSS <category>
+                $rssCategories = [];
+                if (isset($item->category)) {
+                    foreach ($item->category as $cat) {
+                        $catStr = trim((string) $cat);
+                        if (!empty($catStr)) {
+                            $rssCategories[] = $catStr;
+                        }
+                    }
+                }
+
+                // VALIDASI KATA KUNCI KATEGORI DINAMIS
+                if (!empty($keywords)) {
+                    $isRelevant = false;
+                    $searchableText = strtolower($title . ' ' . $description . ' ' . implode(' ', $rssCategories));
+                    foreach ($keywords as $keyword) {
+                        if (str_contains($searchableText, strtolower($keyword))) {
+                            $isRelevant = true;
+                            break;
+                        }
+                    }
+                    if (!$isRelevant) {
+                        Log::info("  [QUEUE FILTER] Artikel diabaikan karena tidak relevan dengan kategori '{$category->name}': \"{$title}\"");
+                        continue;
+                    }
+                }
 
                 // Pembersihan HTML
                 $description = strip_tags($description);
@@ -121,17 +155,6 @@ class ProcessRssSourceJob implements ShouldQueue
                         $publishedAt = \Carbon\Carbon::parse($pubDate);
                     } catch (\Exception $e) {
                         $publishedAt = null;
-                    }
-                }
-
-                // Ekstrak tag dari RSS <category>
-                $rssCategories = [];
-                if (isset($item->category)) {
-                    foreach ($item->category as $cat) {
-                        $catStr = trim((string) $cat);
-                        if (!empty($catStr)) {
-                            $rssCategories[] = $catStr;
-                        }
                     }
                 }
 
