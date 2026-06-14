@@ -45,8 +45,7 @@ class ProcessRssSourceJob implements ShouldQueue
 
         try {
             // Ambil User Agent dari sistem (atau gunakan default)
-            $userAgent = \App\Models\SystemSetting::where('key', 'crawler_user_agent')
-                        ->value('value') ?? 'MuaraJogja-Bot/1.0';
+            $userAgent = \App\Models\SystemSetting::getValue('crawler_user_agent', 'MuaraJogja-Bot/1.0');
 
             // Eksekusi HTTP — Unduh dokumen XML
             $response = Http::withOptions(['verify' => false])
@@ -102,6 +101,11 @@ class ProcessRssSourceJob implements ShouldQueue
 
                 $title       = (string) $item->title;
                 $link        = (string) $item->link;
+
+                // Cek duplikasi cross-portal dari judul yang identik (Sindikasi)
+                $titleExists = Article::where('title', Str::limit($title, 255, ''))->exists();
+                if ($titleExists) continue;
+
                 $description = (string) ($item->description ?? '');
                 $pubDate     = (string) ($item->pubDate ?? '');
 
@@ -236,6 +240,9 @@ class ProcessRssSourceJob implements ShouldQueue
             $dailyStat->increment('total_errors');
 
             Log::error("  [QUEUE] ✘ Gagal: {$this->source->name} -> {$e->getMessage()}");
+            
+            // Lemparkan kembali eksepsi agar ditangkap oleh fitur test_fetch (Skenario 8)
+            throw $e;
         } finally {
             // =========================================================
             // PENGUJIAN MEMORI: Catat konsumsi RAM di akhir setiap Job
@@ -275,11 +282,25 @@ class ProcessRssSourceJob implements ShouldQueue
                     $imageUrls[] = $mediaUrl;
                 }
             }
+
+            // Cek juga <media:thumbnail>
+            if (isset($mediaContent->thumbnail)) {
+                $thumbUrl = (string) $mediaContent->thumbnail->attributes()->url;
+                if (!empty($thumbUrl)) {
+                    $imageUrls[] = $thumbUrl;
+                }
+            }
         }
 
-        // 3. Regex tag img
-        if (isset($item->description)) {
-            preg_match_all('/<img[^>]+src=([\'"])?((?(1)[^\1]*|[^\s>]+))(?(1)\1)/', (string)$item->description, $matches);
+        // 3. Regex tag img (pada description dan content:encoded)
+        $htmlContent = (string) ($item->description ?? '');
+        $contentNamespaces = $item->children('content', true);
+        if (isset($contentNamespaces->encoded)) {
+            $htmlContent .= ' ' . (string) $contentNamespaces->encoded;
+        }
+
+        if (!empty($htmlContent)) {
+            preg_match_all('/<img[^>]+src=([\'"])?((?(1)[^\1]*|[^\s>]+))(?(1)\1)/i', $htmlContent, $matches);
             if (!empty($matches[2])) {
                 foreach ($matches[2] as $src) {
                     $imageUrls[] = $src;

@@ -4,10 +4,7 @@ use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schedule;
 
-// ── Inspirational quote (bawaan Laravel) ──────────────────────────────────
-Artisan::command('inspire', function () {
-    $this->comment(Inspiring::quote());
-})->purpose('Display an inspiring quote')->hourly();
+// ── Command bawaan Laravel (inspire) telah dihapus untuk rilis produksi ──
 
 // ══════════════════════════════════════════════════════════════════════════
 //  JADWAL OTOMATIS — AGREGATOR BERITA LOKAL YOGYAKARTA
@@ -25,12 +22,26 @@ Schedule::command('news:fetch')
     ->appendOutputTo(storage_path('logs/fetch-news.log'));
 
 /**
- * Modul Retensi Database (Native Laravel Prunable):
- * Menggantikan custom command news:cleanup dengan mekanisme bawaan Laravel
- * yang terintegrasi langsung dengan trait MassPrunable di model Article.
- * Lebih efisien: satu bulk DELETE query tanpa looping per-record.
+ * Modul Retensi Artikel — Tahap 1: Karantina (Soft Delete).
+ * Memindahkan artikel yang sudah melewati batas masa aktif ke masa karantina
+ * (kolom deleted_at terisi). Artikel tidak lagi tampil di halaman publik,
+ * tetapi masih bisa dipantau oleh admin melalui Dasbor Karantina.
+ * Dijalankan setiap hari pada tengah malam.
+ */
+Schedule::command('articles:quarantine')
+    ->dailyAt('00:00')
+    ->name('Karantina Artikel Kadaluarsa')
+    ->withoutOverlapping()
+    ->appendOutputTo(storage_path('logs/quarantine-articles.log'));
+
+/**
+ * Modul Retensi Artikel — Tahap 2: Pemusnahan Permanen (Hard Delete).
+ * Menggunakan mekanisme bawaan Laravel MassPrunable untuk menghancurkan
+ * secara permanen artikel yang sudah berada di karantina dan usianya
+ * telah melampaui batas quarantine_retention_days dari pengaturan sistem.
+ * Dijalankan pada tengah malam (5 menit setelah karantina selesai).
  */
 Schedule::command('model:prune', ['--model' => [\App\Models\Article::class]])
-    ->dailyAt('00:00')
-    ->name('Pangkas Artikel Kadaluarsa (>30 hari)')
-    ->appendOutputTo(storage_path('logs/cleanup-articles.log'));
+    ->dailyAt('00:05')
+    ->name('Musnahkan Artikel Karantina Kadaluarsa')
+    ->appendOutputTo(storage_path('logs/prune-articles.log'));

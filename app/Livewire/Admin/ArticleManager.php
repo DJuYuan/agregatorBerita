@@ -32,14 +32,6 @@ class ArticleManager extends Component
         $this->resetPage();
     }
 
-    public function deleteArticle($id)
-    {
-        $article = Article::findOrFail($id);
-        $title = $article->title;
-        $article->delete();
-
-        session()->flash('success', "Artikel \"{$title}\" berhasil dihapus.");
-    }
 
     public function render()
     {

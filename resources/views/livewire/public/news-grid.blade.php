@@ -118,12 +118,14 @@
                             @endif
 
                             <h3 class="font-serif text-base font-bold text-primary leading-snug mb-2 line-clamp-2">
-                                {{-- RUTE TRACKING KUNJUNGAN --}}
+                                {{-- RUTE TRACKING KUNJUNGAN (Klik → redirect ke sumber asli) --}}
+                                {{-- Kelas news-title-link digunakan untuk CSS :visited agar  --}}
+                                {{-- browser menandai berita yang sudah pernah dibuka         --}}
                                 <a
                                     href="{{ route('article.go', $article->slug) }}"
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    class="hover:underline after:absolute after:inset-0"
+                                    class="news-title-link hover:underline after:absolute after:inset-0"
                                 >
                                     {{ $article->title }}
                                 </a>

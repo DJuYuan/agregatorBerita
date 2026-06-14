@@ -7,42 +7,64 @@ use Livewire\Component;
 
 class SettingsManager extends Component
 {
-    public $settings = [];
+    // Array murni [id => value] — paling stabil untuk binding di Livewire
+    public array $settingValues = [];
 
-    protected $rules = [
-        'settings.*.value' => 'required|string',
+    protected array $rules = [
+        'settingValues.*' => 'nullable|string',
     ];
 
-    public function mount()
+    public function mount(): void
     {
-        // Ambil semua setting dari database
-        $this->settings = SystemSetting::all()->toArray();
+        // Self-Healing: pastikan semua key pengaturan ada di database
+        SystemSetting::initializeDefaults();
+        
+        // Form dibiarkan kosong agar placeholder tampil
+        $this->settingValues = [];
     }
 
-    public function save()
+    public function save(): void
     {
-        foreach ($this->settings as $settingData) {
-            $setting = SystemSetting::find($settingData['id']);
-            if ($setting) {
-                // Lakukan validasi sederhana per tipe data jika diperlukan
-                if ($setting->type === 'number' && !is_numeric($settingData['value'])) {
-                    session()->flash('error', "Nilai untuk \"{$setting->label}\" harus berupa angka.");
-                    return;
-                }
-                
-                $setting->update([
-                    'value' => $settingData['value'],
-                ]);
+        \Illuminate\Support\Facades\Log::info('SettingsManager::save dipanggil', [
+            'incoming_values' => $this->settingValues
+        ]);
+
+        // Hanya validasi struktur data array
+        $this->validate();
+
+        $updatedCount = 0;
+
+        foreach ($this->settingValues as $id => $val) {
+            $val = trim($val);
+            if ($val === '') continue; // Abaikan jika input kosong
+
+            $setting = SystemSetting::find($id);
+            if (!$setting) continue;
+
+            // Validasi tipe number
+            if ($setting->type === 'number' && !is_numeric($val)) {
+                $this->dispatch('notify', message: "Nilai untuk \"{$setting->label}\" harus berupa angka.", type: 'error');
+                return;
             }
+
+            $setting->update(['value' => $val]);
+            $updatedCount++;
         }
 
-        session()->flash('success', 'Seluruh konfigurasi sistem berhasil diperbarui.');
+        if ($updatedCount > 0) {
+            $this->dispatch('notify', message: "$updatedCount konfigurasi berhasil diperbarui.", type: 'success');
+        } else {
+            $this->dispatch('notify', message: "Tidak ada konfigurasi yang diubah.", type: 'info');
+        }
+
+        // Reset form setelah simpan
+        $this->settingValues = [];
     }
 
     public function render()
     {
-        // Kelompokkan data setting berdasarkan kolom 'group' untuk UI yang rapi
-        $groupedSettings = collect($this->settings)->groupBy('group');
+        // Ambil ulang dari DB agar data selalu segar dan kelompokkan untuk UI
+        $groupedSettings = SystemSetting::all()->groupBy('group');
 
         return view('livewire.admin.settings-manager', [
             'groupedSettings' => $groupedSettings,

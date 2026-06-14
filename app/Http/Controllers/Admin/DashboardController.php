@@ -65,7 +65,7 @@ class DashboardController extends Controller
             ->map(fn ($log) => [
                 'type'       => 'failed',
                 'source'     => $log->source?->name ?? 'Sumber Dihapus',
-                'detail'     => $log->error_message,
+                'detail'     => \App\Helpers\LogErrorTranslator::translate($log->error_message),
                 'time'       => $log->failed_at,
                 'time_human' => $log->failed_at->diffForHumans(),
             ]);

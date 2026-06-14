@@ -5,12 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\MassPrunable;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Storage;
 
 class Article extends Model
 {
+    use SoftDeletes, MassPrunable;
+
     protected $fillable = [
         'source_id',
         'guid',
@@ -45,26 +48,30 @@ class Article extends Model
         return $this->belongsToMany(Tag::class);
     }
 
-    // ── Prunable — Retensi Otomatis (>30 Hari) ───────────────────────────
-    // Menggunakan MassPrunable agar lebih efisien: tidak memuat model satu-per-satu
-    // ke memory. Satu DELETE query dengan subquery, cukup untuk skala besar.
-    // Gambar dihapus oleh constraint cascadeOnDelete() di level database.
+    // ── Prunable — Pemusnahan Permanen Artikel Karantina ─────────────────
+    // Menggunakan MassPrunable untuk efisiensi: satu bulk forceDelete() query
+    // tanpa loop per-record. Hanya artikel yang SUDAH di karantina (trashed)
+    // dan melampaui batas quarantine_retention_days yang akan dimusnahkan.
 
     /**
-     * Mendefinisikan kriteria artikel yang harus dipangkas.
-     * Semua artikel dengan published_at > 30 hari yang lalu akan dihapus.
+     * Mendefinisikan kriteria artikel yang harus dimusnahkan secara permanen.
+     * Kueri ini hanya menargetkan artikel yang SUDAH di-soft-delete (karantina)
+     * DAN usianya telah melampaui batas masa karantina dari pengaturan sistem.
      */
     public function prunable(): Builder
     {
-        return static::where('published_at', '<', now()->subDays(30));
+        // Ambil batas masa karantina dari pengaturan sistem (default: 90 hari)
+        $days = (int) SystemSetting::getValue('quarantine_retention_days', 90);
+
+        // Hanya musnahkan artikel yang sudah di-karantina (deleted_at terisi)
+        // DAN usia publikasinya sudah melampaui batas karantina
+        return static::onlyTrashed()->where('deleted_at', '<', now()->subDays($days));
     }
 
     /**
      * Hook yang dipanggil sebelum setiap record dipangkas.
-     * Digunakan sebagai pengaman untuk menghapus file gambar lokal
-     * jika kelak aplikasi beralih ke penyimpanan lokal (Storage::disk).
-     * Untuk URL eksternal, penghapusan record di tabel images ditangani
-     * oleh constraint cascadeOnDelete() di database — sudah cukup efisien.
+     * Untuk URL eksternal, penghapusan cascade images ditangani oleh
+     * constraint cascadeOnDelete() di level database — sudah efisien.
      */
     protected function pruning(): void
     {

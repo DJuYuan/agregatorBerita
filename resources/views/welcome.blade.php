@@ -74,6 +74,13 @@
         .section-rule {
             border-top: 3px solid #000;
         }
+
+        /* ── Riwayat Baca: Judul yang sudah dikunjungi ────── */
+        /* Memanfaatkan memori bawaan browser (tanpa database & tanpa login) */
+        /* Browser secara otomatis menerapkan style ini pada URL yang sudah pernah diklik */
+        .news-title-link:visited {
+            color: #9b9b9b !important; /* Abu-abu lebih terang dari warna muted normal */
+        }
     </style>
 </head>
 <body class="bg-canvas text-primary antialiased">

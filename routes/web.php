@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PublicController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DashboardController;
@@ -33,14 +32,12 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
 
     // ── Master Artikel ──
     Route::get('/articles', \App\Livewire\Admin\ArticleManager::class)->name('articles.index');
+    Route::get('/articles/quarantine', \App\Livewire\Admin\QuarantineManager::class)->name('articles.quarantine');
 
     // ── Pengaturan Sistem ──
     Route::get('/settings', \App\Livewire\Admin\SettingsManager::class)->name('settings.index');
 
-    // ── Profil Admin ──
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
 
     // ── Log Sistem ──
     Route::get('/logs', [LogController::class, 'index'])->name('logs.index');

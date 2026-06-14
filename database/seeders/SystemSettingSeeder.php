@@ -13,20 +13,7 @@ class SystemSettingSeeder extends Seeder
     public function run(): void
     {
         $settings = [
-            [
-                'key' => 'fetch_interval_minutes',
-                'value' => '30',
-                'label' => 'Interval Penarikan Berita (Menit)',
-                'type' => 'number',
-                'group' => 'crawler',
-            ],
-            [
-                'key' => 'article_retention_days',
-                'value' => '30',
-                'label' => 'Batas Usia Artikel Disimpan (Hari)',
-                'type' => 'number',
-                'group' => 'database',
-            ],
+
             [
                 'key' => 'crawler_user_agent',
                 'value' => 'MuaraJogja-Bot/1.0',
@@ -35,12 +22,22 @@ class SystemSettingSeeder extends Seeder
                 'type' => 'text',
                 'group' => 'crawler',
             ],
+
             [
-                'key' => 'app_tagline',
-                'value' => 'Kompilasi Informasi Yogyakarta Hari Ini',
-                'label' => 'Slogan Website Utama',
-                'type' => 'text',
-                'group' => 'general',
+                'key' => 'active_retention_days',
+                'value' => '30',
+                'label' => 'Masa Aktif Artikel (Hari)',
+                'description' => 'Artikel yang usianya melebihi batas ini akan dipindahkan ke karantina (disembunyikan dari publik).',
+                'type' => 'number',
+                'group' => 'database',
+            ],
+            [
+                'key' => 'quarantine_retention_days',
+                'value' => '90',
+                'label' => 'Masa Karantina Artikel (Hari)',
+                'description' => 'Artikel yang sudah berada di karantina melebihi batas ini akan dimusnahkan secara permanen.',
+                'type' => 'number',
+                'group' => 'database',
             ],
         ];
 

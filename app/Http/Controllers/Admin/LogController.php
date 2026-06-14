@@ -40,7 +40,7 @@ class LogController extends Controller
                     'type'       => 'failed',
                     'source'     => $log->source?->name ?? 'Sumber Dihapus',
                     'source_url' => $log->source?->rss_url ?? '-',
-                    'detail'     => $log->error_message,
+                    'detail'     => \App\Helpers\LogErrorTranslator::translate($log->error_message),
                     'total'      => 0,
                     'time'       => $log->failed_at,
                     'time_human' => $log->failed_at->diffForHumans(),
